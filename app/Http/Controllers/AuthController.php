@@ -26,13 +26,13 @@ class AuthController extends Controller
             'phoneNumber' => $validate['phoneNumber'],
         ]);
 
-        $token = $user->createToken('myDevice')->plainTextToken;
         $respone = [
             'user' => $user,
-            'token' => $token,
+            'massage'=>'Success'
+            
         ];
 
-        return response($respone);
+        return response($respone,201);
     }
     public function login(Request $request)
     {
@@ -45,24 +45,25 @@ class AuthController extends Controller
             $response = [
                 'message' => 'Email or Password incorrect',
             ];
-            return response($response);
+            return response($response,401);
         } else {
             $user->tokens()->delete();
-            $token = $user->createToken('myDevice')->plainTextToken;
+            $token = $user->createToken($request->userAgent())->plainTextToken;
             $response = [
                 'user' => $user,
                 'token' => $token,
             ];
-            return response($response);
+            return response($response,200);
         }
     }
 
-    public function logout(){
-        auth()->user->tokens()->delete();
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
 
         $respone = [
             'message'=> 'Success'
         ];
-        return $respone;
+        return response($respone,200);
     }
+    
 }
